@@ -1,0 +1,47 @@
+Departments
+{
+    
+    "Name" : str,
+    "Manager" : int,
+    "Id" :  int
+}
+
+Employees
+{
+    
+    "Id" :  int,
+    "FirstName" : str,
+    "LastName" : str,
+    "RecruitYear" : int,
+    "DepartmentId" : int
+}
+
+Shifts
+{
+    "Id" : int,
+    "Day" : str,
+    "Morning" : {
+        "On" : 6,
+        "Off" : 15,
+        "Employees" : [
+        ]
+    },
+    "Evening" : {
+        "On" : 15,
+        "Off" : 6,
+        "Employees" : [
+        ]
+    }
+}
+
+
+Users
+{
+    
+    "FullName" : str,
+    "ActionsAssign" : int,
+    "ActionsRemains" : int,
+    "Email" : str,
+    "Id" :  int,
+    "UserName" : str
+}
