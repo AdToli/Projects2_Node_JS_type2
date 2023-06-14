@@ -4,7 +4,7 @@ const empsModel = require("../database/Mongoose_Modules/Employee_Schema")
 
 // GET - get all employees
 const getAllEmployees = async () => {
-    return empsModel.find({})
+    return await empsModel.find({})
 }
 
 // GET - get employee by exernal ID

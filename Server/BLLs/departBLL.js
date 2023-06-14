@@ -4,8 +4,9 @@ const departModel = require("../database/Mongoose_Modules/Department_Schema")
 
 //GET - get all departments
 const getAllDepartments = async () => {
-    return departModel.find({})
+    return await departModel.find({})
 }
+
 // GET - get department by exernal ID
 const getDepartById = async (id) => {
     const department = await departModel.findOne({ DepartId: id })
