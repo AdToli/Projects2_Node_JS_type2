@@ -1,7 +1,9 @@
-const actionsFile = require("../DAL/localFilePath")
-const jFile = require("jsonfile")
 
-const getActions = async () => {
+const jFile = require("jsonfile")
+const usersBLL = require("./usersBLL")
+
+const getActions = async (id) => {
+    usersData = await usersBLL().getAllUsers
     const actions = await jFile.readFile(actionsFile)
     return actions
 }
