@@ -54,7 +54,8 @@ const loginUser = async (loginData) => {
             }
         });
 
-//if verified, check user's actions limit. 
+    //if verified succeed
+             //check user's actions limit. 
         if (validation) {           
             const userData = await usersBLL.getUserById(userId);
             const { ActionsRemains } = userData;
@@ -62,15 +63,15 @@ const loginUser = async (loginData) => {
                 return "Max acctions for today. Please try again tommorow"
             }
 
-//if there is credit, update users login in JSON file, and return his ID. 
+            //if there is credit, update users login in JSON file, and return his ID. 
             await updateUserInActionFile(userId)
             alert("connected!")
             return userId;
         }
 
-//if verified failed
-        console.log("ERROR ON 'loginBLL'")
-        return "Incorrect email or username";
+    //if verified failed
+        console.log("ERROR ON 'loginBLL -incorrect email or username '")
+        return alert("Incorrect email or username");
 
 //ERROR case
     } catch (error) {
