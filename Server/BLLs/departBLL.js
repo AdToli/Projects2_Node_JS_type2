@@ -1,4 +1,5 @@
 const departModel = require("../database/Mongoose_Modules/Department_Schema")
+const empsBLL = require("./empsBLL")
 
 
 
@@ -10,11 +11,14 @@ const getAllDepartments = async () => {
 // GET - get department by exernal ID
 const getDepartById = async (id) => {
     const department = await departModel.findOne({ DepartId: id })
-    return department;  
+    return department;
 }
-
-//get
-getAllDeparEmps  
+// GET - get all employees of some department
+const getAllDprtsEmps = async (id) => {
+    const allEmps = await empsBLL.getAllEmployees();
+    const departEmps = allEmps.filter(el => el.DepartId == id)
+    return departEmps;
+}
 
 // POST - create a new Department doucument
 const addDepartment = async (depObj) => {
@@ -23,23 +27,20 @@ const addDepartment = async (depObj) => {
     const allDepartments = await getAllDepartments() //for updating client present
     return allDepartments
 }
-// PUT - update department details useing custom key:value
-const updateDepartment = async (key, value, depDeta) => {
+// PUT - update department details using custom key:value
+const updateDepartment = async (id, depData) => {
     try {
-        const customId = {};   //Create an object and contain the custom key:value
-        customId[key] = value;
+        // const customId = {};   //Create an object and contain the custom key:value
+        // customId[key] = value;
 
-
-        const newDepartment = await departModel.findOneAndUpdate(customId, depDeta);  //Update Department details
-
+        const newDepartment = await departModel.findOneAndUpdate(id, depData);  //Update Department details
 
         if (!newDepartment) {
             return console.log("Department not found")  //validation
         }
 
-
         console.log("Department updated successfully!")
-        const updatedDep = await departModel.findOne({ customId }) // use the custom key:value and specify request for returning the updated document.  
+        const updatedDep = await departModel.findOne({ DepartId: id }) // use the custom key:value and specify request for returning the updated document.  
         return updatedDep;  //return updated value.
 
     } catch (error) {
@@ -48,20 +49,32 @@ const updateDepartment = async (key, value, depDeta) => {
 }
 
 // DELETE - remove department
-const removeDepartment = async (key, value,) => {
+const removeDepartment = async (id) => {
     try {
-        const customId = {};   //Create an object and contain the custom key:value
-        customId[key] = value;
+        // const customId = {};   //Create an object and contain the custom key:value
+        // customId[key] = value;
 
-        const removeDepart = await departModel.findOneAndDelete(customId);  //Delete department
+        const removeDepart = await departModel.findOneAndDelete(id);  //Delete department
+        const emps = await getAllDprtsEmps(id)
+        const removeFromDprt = await emps.DepartId.deleteMany(id)
 
+        //validation
         if (!removeDepart) {
-            return console.log("Department not found")  //validation
+            return console.log("Department not found")
         }
-        console.log("Department removed successfully!")
-        return removeDepart  //return deleted department
+        else if (!emps) {
+            return console.log("Employees not found in --> removeDepartment()")
+        }
+
+        //success
+        console.log("Department and Employees removed successfully!")
+        return { removeDepart, removeFromDprt }  //return deleted department and employees
 
     } catch (error) {
-        console.log(error + "ERROR IN departBLL DELETE REQ")
+        console.log(error + "ERROR IN departBLL - DELETE REQ")
     }
+}
+
+module.exports = {
+    getAllDepartments, getDepartById, getAllDprtsEmps, addDepartment, updateDepartment, removeDepartment
 }

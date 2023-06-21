@@ -1,12 +1,12 @@
 const mongoose = require("mongoose")
 
 const departmentSchema = new mongoose.Schema({
-    Name : {type: String},
-    Manager : {
-        FullName : {type: String},
-        EmpId : {required: true, type: Number}
+    Name: { required: true, type: String },
+    Manager: {
+        FullName: { required: false, type: String },
+        EmpId: { required: false, type: Number }
     },
-    DepartId : {required: true, type: Number}
+    DepartId: { required: true, type: Number }
 })
 
 module.exports = mongoose.model("Department", departmentSchema)
