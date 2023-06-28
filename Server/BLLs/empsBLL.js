@@ -22,48 +22,58 @@ const addEmployee = async (empObj) => {
 }
 
 
-// PUT - update employee details useing custom key:value
-const updateEmployee = async (key, value, empDeta) => {
+// PUT - update employee details useing custom id
+const updateEmployee = async (id, empDeta) => {
     try {
-        const customId = {};   //Create an object and contain the custom key:value
-        customId[key] = value;
+        // const customId = {};   //Create an object and contain the custom key:value
+        // customId[key] = value;
 
+        const newEmployee = await empsModel.findOneAndUpdate({ EmpId: id }, empDeta);  //Update employee details
 
-        const newEmployee = await empsModel.findOneAndUpdate(customId, empDeta);  //Update employee details
-
-
-        if (!newEmployee) {
-            return console.log("Employee not found")  //validation
+        //validation
+        if (!newEmployee) { //---> get the ID ?
+            return console.log("Somthing went wrong :/ --> empsBLL --> PUT --> updateEmployee() ")
         }
 
-
-        console.log("Employee updated successfully!")
-        const updatedEmp = await empsModel.findOne({ customId }) // use the custom key:value and specify request for returning the updated document.  
+        console.log("\nEmployee updated successfully!\n")
+        const updatedEmp = await empsModel.findOne({ EmpId: id }) // use the external ID for returning the updated document.  
         return updatedEmp;  //return updated value.
 
     } catch (error) {
-        console.log(error + "ERROR IN empsBLL PUT REQ")
+        console.log(error + "ERROR IN --> empsBLL --> PUT REQ")
     }
 }
 
-// DELETE - remove employee
-const removeEmployee = async (key, value,) => {
+// PUT - remove employees from deleted department. (used in "departBLL --> DELETE --> removeDepartment()" only)
+async function removeEmpsFromDprt(departId) {
     try {
-        const customId = {};   //Create an object and contain the custom key:value
-        customId[key] = value;
+        const result = await empsModel.updateMany(
+            { DepartId: departId }, // Filter criteria
+            { $set: { DepartId: 0 } } // Update operation
+        );
+        console.log(`${result.nModified} employees updated`);
+    } catch (error) {
+        console.error(error + "ERROR IN --> empsBLL --> PUT REQ --> updateDepartId() ");
+    }
+}
 
-        const removedEmpolyee = await empsModel.findOneAndDelete(customId);  //Delete employee
 
-        if (!removedEmpolyee) {
-            return console.log("Employee not found")  //validation
-        }
-        console.log("Employee removed successfully!")
-        return removedEmpolyee  //return deleted employee
+
+// DELETE - delete employee
+const removeEmployee = async (id) => {
+    try {
+        // const customId = {};   //Create an object and contain the custom key:value
+        // customId[key] = value;
+
+        const removedEmpolyee = await empsModel.findOneAndDelete({ EmpId: id });  //delete employee
+
+        console.log("Employee removed successfully!\n")
+        return(`Removed employee details:\n ${removedEmpolyee}\n`)  //return deleted employee
 
     } catch (error) {
-        console.log(error + "ERROR IN empsBLL DELETE REQ")
+        console.log(error + "ERROR IN --> empsBLL -->  DELETE REQ")
     }
 }
 
-module.exports = { getAllEmployees, getEmpById, addEmployee, updateEmployee, removeEmployee }
+module.exports = { getAllEmployees, getEmpById, addEmployee, updateEmployee, removeEmpsFromDprt, removeEmployee }
 

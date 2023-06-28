@@ -5,7 +5,7 @@ const employeeSchema = new mongoose.Schema({
     LastName: { required: true, type: String },
     RecruitYear: { required: false, type: Number },
     EmpId:{ required: true, type: Number },
-    DepartId: { required: true, type: Number }
+    DepartId: { required: false, type: Number }
 
 })
 

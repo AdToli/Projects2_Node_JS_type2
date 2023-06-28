@@ -10,7 +10,7 @@ router.get("/", async (req, res) => {
     try {
         const departments = await departBLL.getAllDepartments()
         res.status(200).json(departments)
-    } catch (e) {
+    } catch (error) {
         res.status(500).json({ error: "Failed in: departRotuer --> GET--> getAllDepartments()" })
     }
 
@@ -23,14 +23,14 @@ router.get("/:DepartId", async (req, res) => {
         const department = await departBLL.getDepartById(DepartId)
         console.log(department)
 
-        if (!department) res.status(404).json({ msg: "departments not found" }) //validation --> right ID ?
+        if (!department) res.status(404).json("departments not found") //validation --> right ID ?
 
         const emps = await departBLL.getAllDprtsEmps(DepartId) //get all emps
         console.log(emps);
         const dprtNemps = { department, emps }
 
         res.status(200).json(dprtNemps)
-    } catch (e) {
+    } catch (error) {
         res.status(500).json({ error: "Failed in: departRotuer --> GET --> getDepartById() " })
     }
 
@@ -40,41 +40,63 @@ router.get("/:DepartId", async (req, res) => {
 router.post("/", async (req, res) => {
     try {
         const newDepart = req.body
-        const validation = await departBLL.getAllDepartments()
+        const allDeparts = await departBLL.getAllDepartments()
         const status = await departBLL.addDepartment(newDepart)
 
-        status.length <= validation.length ? console.log("New department added!") : console.log("FAILED to add depratment"); //validation --> department added? 
-
-        res.status(200).json(status)
+        //validation
+        // if the request body is empty (undefined / null) return status(404)
+        if (!req.body) {
+            res.status(404).json("Please provide a valid body to the request")
+        }
+        // department added? 
+        if (status.length <= allDeparts.length) {
+            res.status(404).json("FAILED to add depratment");
+        }
+        res.status(200).json(`New department added! current departments list:\n ${status}`)
 
     } catch (error) {
         res.status(500).json({ error: "Failed in: departRotuer --> POST --> addDepartment()" })
     }
 })
 
-// PUT - update department details using custom key:value
+// PUT - update department details using custom external ID
 router.put("/:DepartId", async (req, res) => {
     try {
         const { DepartId } = req.params
         const newData = req.body
 
         //validation
-        if (!req.body) res.status(400).json({ erro: "Please provide a body to the request" }) // if the request body is empty (undefined / null) return status(400)
+        const department = await departBLL.getDepartById(DepartId)
+        if (!req.body) {           // ---> if the request body is empty (undefined / null) return status(404)
+            res.status(404).json("Please provide a valid body to the request")
+        }
+        else if (!department) {   //---> right ID ?
 
-        const updtedDprt = await departBLL.updateDepartment(DepartId, newData)
-        res.status(200).json(updtedDprt);
+            res.status(404).json("department not found")
+        }
+
+        const updatedDprt = await departBLL.updateDepartment(DepartId, newData)
+        res.status(200).json(`Old details:\n ${department} \n New details:\n ${updatedDprt}`);
+
     } catch (error) {
-        res.status(500).json({ error: "Failed in: departRotuer --> PUT --> updateDepartment()" })
+        res.status(500).json("Failed in: departRotuer --> PUT --> updateDepartment()")
     }
 })
 
 
-// DELETE - remove department & employees association
+// DELETE - remove department & employees association using custom external ID
 router.delete("/:DepartId", async (req, res) => {
     try {
         const { DepartId } = req.params
         const status = await departBLL.removeDepartment(DepartId)
+
+        //validation
+        if (!status) { // right ID ?
+            res.status(404).json("Department not found")
+        }
+
         res.status(200).json(status);
+
     } catch (error) {
         res.status(500).json({ error: "Failed in: departRotuer --> DELETE --> removeDepartment()" })
     }

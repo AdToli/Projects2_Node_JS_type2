@@ -24,6 +24,7 @@ const getAllDprtsEmps = async (id) => {
 const addDepartment = async (depObj) => {
     const department = new departModel(depObj)
     await department.save()
+
     const allDepartments = await getAllDepartments() //for updating client present
     return allDepartments
 }
@@ -33,14 +34,15 @@ const updateDepartment = async (id, depData) => {
         // const customId = {};   //Create an object and contain the custom key:value
         // customId[key] = value;
 
-        const newDepartment = await departModel.findOneAndUpdate(id, depData);  //Update Department details
+        const newDepartment = await departModel.findOneAndUpdate({ DepartId: id }, depData);  //Update Department details
 
-        if (!newDepartment) {
-            return console.log("Department not found")  //validation
+        //validation
+        if (!newDepartment) { //---> right ID ?
+            return console.log("Somthing went wrong :/ ---> PUT departBLL")
         }
 
-        console.log("Department updated successfully!")
-        const updatedDep = await departModel.findOne({ DepartId: id }) // use the custom key:value and specify request for returning the updated document.  
+        console.log("\n Department updated successfully! \n")
+        const updatedDep = await departModel.findOne({ DepartId: id }) // use external ID for returning the updated document.  
         return updatedDep;  //return updated value.
 
     } catch (error) {
@@ -54,24 +56,21 @@ const removeDepartment = async (id) => {
         // const customId = {};   //Create an object and contain the custom key:value
         // customId[key] = value;
 
-        const removeDepart = await departModel.findOneAndDelete(id);  //Delete department
-        const emps = await getAllDprtsEmps(id)
-        const removeFromDprt = await emps.DepartId.deleteMany(id)
+        const deprtEmps = await getAllDprtsEmps(id)
+        try {
+            await empsBLL.removeEmpsFromDprt(id) //remove the department ID from employees "DepartId". 
 
-        //validation
-        if (!removeDepart) {
-            return console.log("Department not found")
+        } catch (error) {
+            return(error + " \n ERROR IN departBLL - DELETE REQ - removeEmpsFromDprt()")
         }
-        else if (!emps) {
-            return console.log("Employees not found in --> removeDepartment()")
-        }
+        const DprtToRmove = await departModel.findOneAndDelete({ DepartId: id });  //Delete department
 
         //success
-        console.log("Department and Employees removed successfully!")
-        return { removeDepart, removeFromDprt }  //return deleted department and employees
+        console.log("Successfull to remove the employees, and delete the department.\n")
+        return (`Department removed: \n ${DprtToRmove},\n The employees were updated:\n ${deprtEmps}\n`)  //return deleted department and updated employees
 
     } catch (error) {
-        console.log(error + "ERROR IN departBLL - DELETE REQ")
+        console.log(error + " \n ERROR IN departBLL - DELETE REQ")
     }
 }
 
