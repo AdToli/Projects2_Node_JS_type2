@@ -10,7 +10,7 @@ router.get("/", async (req, res) => {
     try {
         const employees = await empsBLL.getAllEmployees()
         res.status(200).json(employees)
-    } catch (e) {
+    } catch (error) {
         res.status(500).json({ error: "Failed in: empsRout --> GET--> getAllEmployees()" })
     }
 

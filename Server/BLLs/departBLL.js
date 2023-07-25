@@ -28,11 +28,9 @@ const addDepartment = async (depObj) => {
     const allDepartments = await getAllDepartments() //for updating client present
     return allDepartments
 }
-// PUT - update department details using custom key:value
+// PUT - update department details
 const updateDepartment = async (id, depData) => {
     try {
-        // const customId = {};   //Create an object and contain the custom key:value
-        // customId[key] = value;
 
         const newDepartment = await departModel.findOneAndUpdate({ DepartId: id }, depData);  //Update Department details
 

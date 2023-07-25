@@ -14,7 +14,7 @@ const getUserById = async (id) => {
         const user = await usersModel.findOne({ EmpId: id })
         return user;
     } catch (error) {
-        console.log(error + "ERROR IN usersBLL GET by id REQ- can't find user?")
+       return console.log(error + "ERROR IN usersBLL ---> GET by id ---> REQ")
     }
 
 }
