@@ -3,7 +3,7 @@ const router = express.Router()
 const shiftsBLL = require("../BLLs/shiftsBLL")
 
 
-// localhost:8000/depart
+// localhost:8000/shifts
 
 //GET - get all users or handle querys 
 router.get("/", async (req, res) => {
@@ -95,4 +95,4 @@ router.delete("/:ExId", async (req, res) => {
         return res.status(500).json({ error: "Failed in: usersRout --> DELETE --> deleteUser()" })
     }
 })
-
+module.exports = router

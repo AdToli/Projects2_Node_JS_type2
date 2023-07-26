@@ -1,9 +1,8 @@
 const express = require('express');
-const router = express.Router()
 const departBLL = require("../BLLs/departBLL")
+const router = express.Router()
 
-
-// localhost:8000/depart
+// localhost:8000/departments
 
 //GET - get all departments
 router.get("/", async (req, res) => {
@@ -23,7 +22,7 @@ router.get("/:DepartId", async (req, res) => {
         const department = await departBLL.getDepartById(DepartId)
         console.log(department)
 
-        if (!department) res.status(404).json("departments not found") //validation --> right ID ?
+        if (!department) res.status(404).json("department not found") //validation --> right ID ?
 
         const emps = await departBLL.getAllDprtsEmps(DepartId) //get all emps
         console.log(emps);
@@ -101,3 +100,5 @@ router.delete("/:DepartId", async (req, res) => {
         res.status(500).json({ error: "Failed in: departRotuer --> DELETE --> removeDepartment()" })
     }
 })
+
+module.exports = router

@@ -2,10 +2,10 @@ const departModel = require("../database/Mongoose_Modules/Department_Schema")
 const empsBLL = require("./empsBLL")
 
 
-
 //GET - get all departments
 const getAllDepartments = async () => {
-    return await departModel.find({})
+    const allDeparts = await departModel.find({})
+    return allDeparts
 }
 
 // GET - get department by exernal ID
@@ -13,7 +13,7 @@ const getDepartById = async (id) => {
     const department = await departModel.findOne({ DepartId: id })
     return department;
 }
-// GET - get all employees of some department
+// GET - get all department of some department
 const getAllDprtsEmps = async (id) => {
     const allEmps = await empsBLL.getAllEmployees();
     const departEmps = allEmps.filter(el => el.DepartId == id)

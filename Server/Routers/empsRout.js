@@ -3,7 +3,7 @@ const router = express.Router()
 const empsBLL = require("../BLLs/empsBLL")
 
 
-// localhost:8000/depart
+// localhost:8000/employees
 
 //GET - get all employees
 router.get("/", async (req, res) => {
@@ -98,3 +98,4 @@ router.delete("/:EmpId", async (req, res) => {
         res.status(500).json({ error: "Failed in: empsRout --> DELETE --> removeEmployee()" })
     }
 })
+module.exports = router
