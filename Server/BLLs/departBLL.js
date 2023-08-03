@@ -30,21 +30,12 @@ const addDepartment = async (depObj) => {
 }
 // PUT - update department details
 const updateDepartment = async (id, depData) => {
-    try {
-
-        const newDepartment = await departModel.findOneAndUpdate({ DepartId: id }, depData);  //Update Department details
-
-        //validation
-        if (!newDepartment) { //---> right ID ?
-            return console.log("Somthing went wrong :/ ---> PUT departBLL")
-        }
-
-        console.log("\n Department updated successfully! \n")
-        const updatedDep = await departModel.findOne({ DepartId: id }) // use external ID for returning the updated document.  
-        return updatedDep;  //return updated value.
+    try { 
+        const newDepartment = await departModel.findOneAndUpdate({ DepartId: id }, depData, {new: true});  //Update Department details
+        return {newDepartment};  //return updated value.
 
     } catch (error) {
-        console.log(error + "ERROR IN departBLL PUT REQ")
+        return {error}
     }
 }
 

@@ -61,26 +61,28 @@ router.post("/", async (req, res) => {
 // PUT - update department details using custom external ID
 router.put("/:DepartId", async (req, res) => {
     try {
+        //validation ---> bad request
+        if (!req.body || !req.params || typeof req.body === 'string' || typeof req.params === 'string') {           // ---> if the request body is empty (undefined / null) return status(400)
+            return res.status(400).json("Please provide a valid data to the request")
+        }
+
         const { DepartId } = req.params
         const newData = req.body
-
-        //validation
         const department = await departBLL.getDepartById(DepartId)
-        if (!req.body) {           // ---> if the request body is empty (undefined / null) return status(404)
-            res.status(404).json("Please provide a valid body to the request")
-        }
-        else if (!department) {   //---> right ID ?
 
-            res.status(404).json("department not found")
+        //validation ---> //---> right ID ?
+        if (!department) {
+            return res.status(404).json({ error: "department not found" })
         }
 
         const updatedDprt = await departBLL.updateDepartment(DepartId, newData)
-        res.status(200).json(`Old details:\n ${department} \n New details:\n ${updatedDprt}`);
+        return res.status(200).json({ Old: department, Updated: updatedDprt });
 
     } catch (error) {
-        res.status(500).json("Failed in: departRotuer --> PUT --> updateDepartment()")
+        return res.status(500).json(error)
     }
 })
+
 
 
 // DELETE - remove department & employees association using custom external ID
