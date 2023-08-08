@@ -17,7 +17,6 @@ const getAllActions = async () => {
 
 }
 
-
 //GET -  get last user's action. use to getting user's ID and current actions allowd.
 const getLastUserAction = async () => {
     const actionsArr = await getAllActions()
