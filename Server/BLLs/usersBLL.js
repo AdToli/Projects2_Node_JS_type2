@@ -5,7 +5,12 @@ const actionsBLL = require("./actionsBLL")
 
 //GET - get all users  from DB
 const getAllUsers = async () => {
-    return await usersModel.find({})
+    try {
+        return await usersModel.find({})
+    } catch (error) {
+        return {error: error}
+    }
+
 }
 
 //GET - get user from DB by external ID
@@ -14,7 +19,7 @@ const getUserById = async (id) => {
         const user = await usersModel.findOne({ EmpId: id })
         return user;
     } catch (error) {
-       return console.log(error + "ERROR IN usersBLL ---> GET by id ---> REQ")
+        return {error: error};
     }
 
 }

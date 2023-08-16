@@ -8,29 +8,39 @@ const router = express.Router()
 router.get("/", async (req, res) => {
     try {
         const departments = await departBLL.getAllDepartments()
-        res.status(200).json(departments)
+        return res.status(200).json(departments)
     } catch (error) {
-        res.status(500).json({ error: "Failed in: departRotuer --> GET--> getAllDepartments()" })
+        return res.status(500).json({ error })
     }
 
 })
 
-// GET - get department by exernal ID & all employees of it.
+// GET - get department by exernal ID & all its employees .
 router.get("/:DepartId", async (req, res) => {
     try {
         const { DepartId } = req.params
-        const department = await departBLL.getDepartById(DepartId)
-        console.log(department)
 
-        if (!department) res.status(404).json("department not found") //validation --> right ID ?
+        //validation --> good request?
+        if (!DepartId) {
+            return res.status(400).json("Bad request. Please try again")
+        }
+        const department = await departBLL.getDepartById(DepartId) //get the department
+        const emps = await departBLL.getAllDprtsEmps(DepartId) //get all employees of the department
 
-        const emps = await departBLL.getAllDprtsEmps(DepartId) //get all emps
-        console.log(emps);
-        const dprtNemps = { department, emps }
+        //validation --> right details?
+        if (!department) {
+            return res.status(404).json("Department not found")
+        }
+        if (emps.length <= 0) {
+            return res.status(404).json("Employees not found")
+        }
 
-        res.status(200).json(dprtNemps)
+        //success
+        const dprtAndemps = { department, emps }
+        return res.status(200).json(dprtAndemps)
+
     } catch (error) {
-        res.status(500).json({ error: "Failed in: departRotuer --> GET --> getDepartById() " })
+        return res.status(500).json({ error })
     }
 
 })
@@ -38,23 +48,26 @@ router.get("/:DepartId", async (req, res) => {
 // POST - create a new Department doucument
 router.post("/", async (req, res) => {
     try {
+        //validation  --> good body?
+        if (!req.body) {
+            return res.status(404).json("Please provide a valid body to the request")
+        }
+
         const newDepart = req.body
         const allDeparts = await departBLL.getAllDepartments()
-        const status = await departBLL.addDepartment(newDepart)
+        const isAdded = await departBLL.addDepartment(newDepart)
 
-        //validation
-        // if the request body is empty (undefined / null) return status(404)
-        if (!req.body) {
-            res.status(404).json("Please provide a valid body to the request")
+
+        //validation  --> department added? 
+        if (isAdded.length <= allDeparts.length || allDeparts.length <= 0) {
+            return res.status(404).json("FAILED to add depratment");
         }
-        // department added? 
-        if (status.length <= allDeparts.length) {
-            res.status(404).json("FAILED to add depratment");
-        }
-        res.status(200).json(`New department added! current departments list:\n ${status}`)
+
+        //success
+        return res.status(201).json({ msg: "New department added!", isAdded })
 
     } catch (error) {
-        res.status(500).json({ error: "Failed in: departRotuer --> POST --> addDepartment()" })
+        return res.status(500).json({ error })
     }
 })
 
@@ -62,44 +75,49 @@ router.post("/", async (req, res) => {
 router.put("/:DepartId", async (req, res) => {
     try {
         //validation ---> bad request
-        if (!req.body || !req.params || typeof req.body === 'string' || typeof req.params === 'string') {           // ---> if the request body is empty (undefined / null) return status(400)
+        if (!req.body || !req.params) {
             return res.status(400).json("Please provide a valid data to the request")
         }
 
-        const { DepartId } = req.params
-        const newData = req.body
-        const department = await departBLL.getDepartById(DepartId)
+        const { DepartId } = req.params;
+        const newData = req.body;
+        const department = await departBLL.getDepartById(DepartId);
+        const updatedDprt = await departBLL.updateDepartment(DepartId, newData)
 
-        //validation ---> //---> right ID ?
-        if (!department) {
-            return res.status(404).json({ error: "department not found" })
+        //validation ---> right ID? (is department exsist?) & valid model?
+        if (!department || !updatedDprt) {
+            return res.status(404).json({ error: "Department update Failed. Please check the provided data " });
         }
 
-        const updatedDprt = await departBLL.updateDepartment(DepartId, newData)
-        return res.status(200).json({ Old: department, Updated: updatedDprt });
+        //success
+        return res.status(201).json({ Old: department, Updated: updatedDprt });
 
     } catch (error) {
-        return res.status(500).json(error)
+        return res.status(500).json({ error })
     }
 })
-
 
 
 // DELETE - remove department & employees association using custom external ID
 router.delete("/:DepartId", async (req, res) => {
     try {
+        //validation ---> bad request
+        if (!req.params) {
+            return res.status(400).json("Please provide a valid data to the request")
+        }
         const { DepartId } = req.params
-        const status = await departBLL.removeDepartment(DepartId)
 
-        //validation
-        if (!status) { // right ID ?
-            res.status(404).json("Department not found")
+        const isDeleted = await departBLL.removeDepartment(DepartId)
+
+        //validation ---> deletion successful?
+        if (isDeleted.status !== true) {
+            return res.status(404).json({ error: "Deletion failed" })
         }
 
-        res.status(200).json(status);
+        return res.status(200).json(isDeleted);
 
     } catch (error) {
-        res.status(500).json({ error: "Failed in: departRotuer --> DELETE --> removeDepartment()" })
+        return res.status(500).json({ error })
     }
 })
 

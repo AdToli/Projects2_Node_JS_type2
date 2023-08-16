@@ -44,20 +44,6 @@ const updateEmployee = async (id, empDeta) => {
     }
 }
 
-// PUT - remove employees from deleted department. (used in "departBLL --> DELETE --> removeDepartment()" only)
-async function removeEmpsFromDprt(departId) {
-    try {
-        const result = await empsModel.updateMany(
-            { DepartId: departId }, // Filter criteria
-            { $set: { DepartId: 0 } } // Update operation
-        );
-        console.log(`${result.nModified} employees updated`);
-    } catch (error) {
-        console.error(error + "ERROR IN --> empsBLL --> PUT REQ --> updateDepartId() ");
-    }
-}
-
-
 
 // DELETE - delete employee
 const removeEmployee = async (id) => {
@@ -75,5 +61,5 @@ const removeEmployee = async (id) => {
     }
 }
 
-module.exports = { getAllEmployees, getEmpById, addEmployee, updateEmployee, removeEmpsFromDprt, removeEmployee }
+module.exports = { getAllEmployees, getEmpById, addEmployee, updateEmployee, removeEmployee }
 

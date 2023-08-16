@@ -1,12 +1,12 @@
 const mongoose = require("mongoose")
 
 const departmentSchema = new mongoose.Schema({
-    Name: String,
+    Name: { type: String, required: true },
     Manager: {
-        FullName: String, 
-        EmpId: Number
+        FullName: { type: String, required: false },
+        EmpId: { type: Number, required: false }
     },
-    DepartId: Number
+    DepartId: { type: Number, required: true }
 })
 
 module.exports = mongoose.model("department", departmentSchema)
@@ -14,12 +14,11 @@ module.exports = mongoose.model("department", departmentSchema)
 
 
 
-
 // const departmentSchema = new mongoose.Schema({
-//     Name: { type: String, required: true },
+//     Name: String,
 //     Manager: {
-//         FullName: { type: String, required: false },
-//         EmpId: { type: Number, required: false }
+//         FullName: String, 
+//         EmpId: Number
 //     },
-//     DepartId: { type: Number, required: true }
+//     DepartId: Number
 // })
