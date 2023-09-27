@@ -9,9 +9,9 @@ const usersBLL = require("../BLLs/usersBLL")
 router.get("/", async (req, res) => {
     try {
         const users = await usersBLL.getAllUsers()
-        res.status(200).json({users})
+        return res.status(200).json({ users })
     } catch (error) {
-        res.status(500).json({ error: "Failed in: usersRout --> GET--> getAllUsers()" })
+        return res.status(500).json({ error: "Failed in: usersRout --> GET--> getAllUsers()" })
     }
 
 })
@@ -22,12 +22,14 @@ router.get("/:EmpId", async (req, res) => {
         const { EmpId } = req.params
         const user = await usersBLL.getUserById(EmpId)
 
-        //validation
-        if (!user) { res.status(404).json({ error: "user not found --> usersRout --> GET --> getUserById()" }) }  //--> right ID ?
-        res.status(200).json({user})
+        //validation 
+        if (!user) { 
+            return res.status(404).json({ error: "user not found --> usersRout --> GET --> getUserById()" })
+        }  
+        return res.status(200).json({ user })
 
     } catch (error) {
-        res.status(500).json({ error: "Failed in: usersRout --> GET --> getEmpById() " })
+        return res.status(500).json({ error: "Failed in: usersRout --> GET --> getEmpById() " })
     }
 
 })
@@ -36,10 +38,10 @@ router.get("/:EmpId", async (req, res) => {
 router.post("/", async (req, res) => {
     try {
 
-        res.status(405).json({ error: "Users collection can be change directly from DB or server side only." })
+        return res.status(405).json({ error: "Users collection can be change directly from DB or server side only." })
     }
     catch (error) {
-        res.status(500).json({ error: "Failed in: usersRout --> POST --> addUser()" })
+        return res.status(500).json({ error: "Failed in: usersRout --> POST --> addUser()" })
     }
 })
 
@@ -48,10 +50,10 @@ router.post("/", async (req, res) => {
 router.put("/:EmpId", async (req, res) => {
     try {
 
-        res.status(405).json({ error: "Users collection can be deleted only directly from DB." })
+        return res.status(405).json({ error: "Users collection can be updated directly from DB only." })
     }
     catch (error) {
-        res.status(500).json({ error: "Failed in: usersRout --> PUT --> updateUser()" })
+        return res.status(500).json({ error: "Failed in: usersRout --> PUT --> updateUser()" })
     }
 })
 
@@ -60,10 +62,10 @@ router.put("/:EmpId", async (req, res) => {
 router.delete("/:EmpId", async (req, res) => {
     try {
 
-        res.status(405).json({ error: "Users collection can be deleted only directly from DB." })
+        return res.status(405).json({ error: "Users collection can be deleted directly from DB only." })
     }
     catch (error) {
-        res.status(500).json({ error: "Failed in: usersRout --> DELETE --> deleteUser()" })
+        return res.status(500).json({ error: "Failed in: usersRout --> DELETE --> deleteUser()" })
     }
 })
 module.exports = router

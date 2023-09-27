@@ -20,9 +20,11 @@ router.get("/", async (req, res) => {
         const response = await shiftsBLL.getShiftsByQuery(req.query)
 
         //validation: if status = true ---> return data. Else print an error message.
-        if (response.status) res.status(200).json(response.data)
-        return res.status(404).json(response.data)
-
+        if (response.status !== true) {
+            return res.status(404).json(response.data)
+        }
+        
+        return res.status(200).json(response.data)
 
 
     } catch (error) {
@@ -43,19 +45,19 @@ router.post("/", async (req, res) => {
         //validation
         // if the request body is empty (undefined / null) return status(404)
         if (!req.body) {
-            res.status(404).json({ error: "Please provide a valid body to the request ---> shiftsRout ---> POST" })
+           return res.status(404).json({ error: "Please provide a valid body to the request ---> shiftsRout ---> POST" })
         }
 
         //Added Confirmation:
         //Fail case:
         if (addConfirm.length <= allShifts.length) {
-            res.status(404).json({ error: "FAILED to add shift  ---> shiftsRout --> POST" });
+           return res.status(404).json({ error: "FAILED to add shift  ---> shiftsRout --> POST" });
         }
         //Success case: 
-        res.status(200).json(`New shift added! Current shifts list:\n ${addConfirm}`)
+       return res.status(200).json(`New shift added! Current shifts list:\n ${addConfirm}`)
 
     } catch (error) {
-        res.status(500).json({ error: "Failed in: shiftsRout ---> POST ---> addShift()" })
+       return res.status(500).json({ error: "Failed in: shiftsRout ---> POST ---> addShift()" })
     }
 })
 
@@ -77,10 +79,10 @@ router.put("/:ExId", async (req, res) => {
         }
 
         const updatedDprt = await shiftsBLL.updateShift(ExId, newData)
-        res.status(200).json(`Old details:\n ${shift} \n New details:\n ${updatedDprt} \n`);
+        return res.status(200).json(`Old details:\n ${shift} \n New details:\n ${updatedDprt} \n`);
 
     } catch (error) {
-        res.status(500).json({ error: "Failed in: shiftsRout --> PUT --> updateDepartment()\n" })
+        return res.status(500).json({ error: "Failed in: shiftsRout --> PUT --> updateDepartment()\n" })
     }
 })
 

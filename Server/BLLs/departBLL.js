@@ -50,16 +50,21 @@ const addDepartment = async (depObj) => {
     }
 
 }
+
+
+
 // PUT - update department details
 const updateDepartment = async (id, depData) => {
     try {
         const newDepartment = await departModel.findOneAndUpdate({ DepartId: id }, depData, { new: true });  //Update Department details
-        return { newDepartment };  //return updated department.
+        return newDepartment ;  //return updated department.
 
     } catch (error) {
         return { error: error };
     }
 }
+
+
 
 
 // DELETE - delete department & remove all employees related to the department 
@@ -79,12 +84,12 @@ const removeDepartment = async (id) => {
     }
 
     try {
-        const dprtToRmove = await departModel.findOneAndDelete({ DepartId: id });  //Delete department
+        const dprtToRmove = await departModel.findOneAndDelete({ DepartId: id });  //delete department
         const isRemoved = await removeEmpsFromDprt(id); //remove the department from the related employees collections.
         const deprtEmps = await getAllDprtsEmps(id);  //get all employees related to the department.
         //validation ---> deletion successful ? 
         if (!dprtToRmove && !isRemoved) {
-            throw new Error("Department Deletion falied & Failed to remove the department ID from the related employees collections.");
+            throw new Error("Department Deletion failed & Failed to remove the department ID from the related employees collections.");
         }
         else if (!dprtToRmove) {
             throw new Error("Department Deletion falied.");

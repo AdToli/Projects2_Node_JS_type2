@@ -1,7 +1,7 @@
-    const shiftsModel = require("../database/Mongoose_Modules/Shift_Schema")
+const shiftsModel = require("../database/Mongoose_Modules/Shift_Schema")
 
 // GET - get all shifts
-    const getAllShifts = async () => {
+const getAllShifts = async () => {
     try {
         const shifts = await shiftsModel.find({})
         return shifts
@@ -11,8 +11,8 @@
     }
 
 }
-//GET - shift by ex ID or by day name
-    const getShiftByIdOrName = async (dayName, id) => {
+//GET - shift by ex ID or by day's name
+const getShiftByIdOrName = async (dayName, id) => {
     try {
         const shift = await shiftsModel.find({ $or: [{ Day: dayName }, { ExId: id }] });
 
@@ -23,14 +23,14 @@
 
         return shift
     } catch (error) {
-        console.log(error + "ERROR IN: shiftsBLL ---> GET ---> shift by ex ID or by day Name  ---> REQ")
+        return console.log(error + "ERROR IN: shiftsBLL ---> GET ---> shift by ex ID or by day Name  ---> REQ")
     }
 
 }
 
 
 // GET - get shifts by quary
-    const getShiftsByQuery = async (query) => {
+const getShiftsByQuery = async (query) => {
 
     //GET - all employee shifts, using "employee Id" (EmpId)
     async function getEmpShifts(userId) {
@@ -56,7 +56,7 @@
 
     }
 
-    // Hadnle querys:
+    // Handle querys:
     try {
         let results = []
 
@@ -88,10 +88,15 @@
 
 //POST - create new shift
 const addShift = async (empObj) => {
-    const shift = new shiftsModel(empObj)
-    await shift.save()
-    const shifts = await getAllShifts() //for updating client presentation
-    return shifts
+    try {
+        const shift = new shiftsModel(empObj)
+        await shift.save()
+        const shifts = await getAllShifts() //for updating client presentation
+        return shifts
+    } catch (error) {
+        return { error };
+    }
+
 }
 
 
@@ -111,9 +116,9 @@ const updateShift = async (id, shiftData) => {
         return updatedShift;  //return updated value.
 
     } catch (error) {
-        console.log(error + "ERROR IN: shiftsBLL ---> PUT ---> REQ")
+        return console.log(error + "ERROR IN: shiftsBLL ---> PUT ---> REQ")
     }
 }
 
 
-module.exports = { getAllShifts, getShiftsByQuery,getShiftByIdOrName, addShift, updateShift }
+module.exports = { getAllShifts, getShiftsByQuery, getShiftByIdOrName, addShift, updateShift }

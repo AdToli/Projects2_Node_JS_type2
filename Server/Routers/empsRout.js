@@ -11,91 +11,115 @@ router.get("/", async (req, res) => {
         const employees = await empsBLL.getAllEmployees()
         res.status(200).json(employees)
     } catch (error) {
-        res.status(500).json({ error: "Failed in: empsRout --> GET--> getAllEmployees()" })
+        res.status(500).json({ error })
     }
 
 })
 
-// GET - 
+// GET -  employee by exernal ID
 router.get("/:EmpId", async (req, res) => {
     try {
         const { EmpId } = req.params
-        const employee = await empsBLL.getEmpById(EmpId)
+        //validation --> good request?
+        if (!EmpId) {
+            return res.status(400).json("Bad request. Please try again")
+        }
+        const employee = await empsBLL.getEmpById(EmpId) //get the employee
 
-        //validation
-        if (!employee) { res.status(404).json("employee not found --> empsRout --> GET -->getEmpById()") }  //--> right ID ?
-        res.status(200).json(employee)
+        //validation --> right ID ?
+        if (!employee) {
+            return res.status(404).json("Employee not found")
+        }
+
+        //success
+        return res.status(200).json(employee)
 
     } catch (error) {
-        res.status(500).json({ error: "Failed in: empsRout --> GET --> getEmpById() " })
+        return res.status(500).json({ error: "Failed in: empsRout --> GET --> getEmpById() " })
     }
 
-})
-// POST - 
+});
+
+
+
+// POST - create a new Employee doucument
 router.post("/", async (req, res) => {
     try {
-        const newEmp = req.body
-        const allEmps = await empsBLL.getAllEmployees()
-        const status = await empsBLL.addEmployee(newEmp)
 
         //validation
         // if the request body is empty (undefined / null) return status(404)
         if (!req.body) {
-            res.status(404).json("Please provide a valid body to the request --> empsRout --> POST")
+            return res.status(400).json("Please provide a valid data to the request")
         }
-        // employee added? 
-        if (status.length <= allEmps.length) {
-            res.status(404).json("FAILED to add employee  --> empsRout --> POST");
+
+        const newEmp = req.body
+        const allEmps = await empsBLL.getAllEmployees()
+        const status = await empsBLL.addEmployee(newEmp)
+
+        // employee added?
+        if (status.length <= allEmps.length || allEmps.length <= 0) {
+            return res.status(404).json("FAILED to add employee");
         }
-        res.status(200).json(`New employee added! Current employees list:\n ${status}`)
+
+        //success
+        return res.status(201).json(`New employee added! Current employees list:\n ${status}`)
 
     } catch (error) {
-        res.status(500).json({ error: "Failed in: empsRout --> POST --> addEmployee()" })
+        return res.status(500).json({ error: "Failed in: empsRout --> POST --> addEmployee()" })
     }
 })
 
 
-// PUT - 
+// // PUT - update employee details using external ID
 router.put("/:EmpId", async (req, res) => {
     try {
-        const { EmpId } = req.params
-        const newData = req.body
+
+        const { EmpId } = req.params;
+        const newData = req.body;
+        const employee = await empsBLL.getEmpById(EmpId)
 
         //validation
-        const employee = await empsBLL.getEmpById(EmpId)
-        if (!req.body) {           // ---> if the request body is empty (undefined / null) return status(404)
-            res.status(404).json("Please provide a valid body to the request --> empsRout --> PUT \n")
-        }
-        else if (!employee) {   //---> right ID ?
-
-            res.status(404).json("employee not found --> empsRout --> PUT \n")
+        if (!req.body || !req.params || !employee) {   // ---> if the request is empty (undefined / null) return status(404)
+            return res.status(400).json("Please provide a valid data to the request \n");
         }
 
-        const updatedDprt = await empsBLL.updateEmployee(EmpId, newData)
-        res.status(200).json(`Old details:\n ${employee} \n New details:\n ${updatedDprt} \n`);
+        //success
+        const updatedEmp = await empsBLL.updateEmployee(EmpId, newData);
+
+        return res.status(201).json({ Old: employee, Updated: updatedEmp });
 
     } catch (error) {
-        res.status(500).json("Failed in: empsRout --> PUT --> updateDepartment()\n")
+        return res.status(500).json({ error })
     }
 })
 
 
-// DELETE - 
+// DELETE - remove employee using external ID
 router.delete("/:EmpId", async (req, res) => {
     try {
-        const { EmpId } = req.params
 
-        //validation
-        const employee = await empsBLL.getEmpById(EmpId)
-        if (!employee) {        //---> right ID ?
-            res.status(404).json("Employee not found --> empsRout --> DELETE \n")
+        //validation ---> bad request
+        if (!req.params) {
+            return res.status(400).json("Please provide a valid data to the request")
         }
 
-        const status = await empsBLL.removeEmployee(EmpId)
-        res.status(200).json(status)
+        const { EmpId } = req.params
+
+        const isDeleted = await empsBLL.removeEmployee(EmpId)
+
+        //validation ---> deletion successful?
+        if (isDeleted.status !== true) {
+            return res.status(404).json({ error: "Deletion failed" })
+        }
+
+        //success
+        return res.status(200).json(isDeleted);
 
     } catch (error) {
-        res.status(500).json({ error: "Failed in: empsRout --> DELETE --> removeEmployee()" })
+        return res.status(500).json({ error: "Failed in: empsRout --> DELETE --> removeEmployee()" })
     }
 })
+
+
+
 module.exports = router

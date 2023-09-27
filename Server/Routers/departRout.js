@@ -50,7 +50,7 @@ router.post("/", async (req, res) => {
     try {
         //validation  --> good body?
         if (!req.body) {
-            return res.status(404).json("Please provide a valid body to the request")
+            return res.status(400).json("Please provide a valid data to the request")
         }
 
         const newDepart = req.body
@@ -71,7 +71,8 @@ router.post("/", async (req, res) => {
     }
 })
 
-// PUT - update department details using custom external ID
+
+// PUT - update department details using external ID
 router.put("/:DepartId", async (req, res) => {
     try {
         //validation ---> bad request
@@ -98,7 +99,7 @@ router.put("/:DepartId", async (req, res) => {
 })
 
 
-// DELETE - remove department & employees association using custom external ID
+// DELETE - remove department & employees association using external ID
 router.delete("/:DepartId", async (req, res) => {
     try {
         //validation ---> bad request
@@ -113,7 +114,8 @@ router.delete("/:DepartId", async (req, res) => {
         if (isDeleted.status !== true) {
             return res.status(404).json({ error: "Deletion failed" })
         }
-
+        
+        //success
         return res.status(200).json(isDeleted);
 
     } catch (error) {
